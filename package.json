@@ -45,5 +45,11 @@
 	"dependencies": {
 		"zod": "^3.22.4"
 	},
-	"license":"MIT"
+	"license":"MIT",
+	"keywords": [
+		"sveltekit",
+		"svelte",
+		"typesafe",
+		"api"
+	]
 }
