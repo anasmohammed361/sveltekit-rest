@@ -30,7 +30,7 @@ export function generateServer(
 				const parsedData = currentRouteObject.schema?.parse(data);
 
 				const result = await currentRouteObject.cb(parsedData);
-				return json(result);
+				return json({output:result});
 			} else {
 				throw error(405);
 			}

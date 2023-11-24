@@ -37,7 +37,8 @@ export function generateClient<T>(
 			const response = await request;
 
 			if (response.ok) {
-				return await response?.json();
+				const result = await response.json()
+				return result?.output;
 			} else {
 				throw new Error(await response.text());
 			}
