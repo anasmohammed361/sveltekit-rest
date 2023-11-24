@@ -1,7 +1,11 @@
 import type { z } from 'zod';
 
 type Client<T> = {
-	[K in keyof T]: T[K] extends { cb: (args: infer M) => infer U } ? (args: M) => Promise<U> : never;
+	[K in keyof T]: T[K] extends { cb: (args: infer M) => infer U }
+		? (args: M) => Promise<U>
+		: (T[K] extends { cb: () => infer U }
+		  ? () => Promise<U>
+		  : never);
 };
 
 export function generateClient<T>(
@@ -37,7 +41,7 @@ export function generateClient<T>(
 			const response = await request;
 
 			if (response.ok) {
-				const result = await response.json()
+				const result = await response.json();
 				return result?.output;
 			} else {
 				throw new Error(await response.text());
