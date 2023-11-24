@@ -1,12 +1,10 @@
 import type { z } from 'zod';
 
 type Client<T> = {
-	[K in keyof T]: T[K] extends { cb: (args: infer M) => infer U }
-		? (args: M) => Promise<U>
-		: (T[K] extends { cb: () => infer U }
-		  ? () => Promise<U>
-		  : never);
-};
+	[K in keyof T]: T[K] extends { cb: (...args: infer M) => infer U }
+	  ? (...args: M) => Promise<U>
+	:never
+  };
 
 export function generateClient<T>(
 	input: Record<

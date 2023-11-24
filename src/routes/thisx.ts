@@ -1,4 +1,4 @@
-import { SvelteKitREST } from "$lib/index.js";
+import { SvelteKitREST, generateClient } from "$lib/index.js";
 import { z } from "zod";
 
 const rest = new SvelteKitREST()
@@ -11,7 +11,10 @@ const obj = {
         name:z.string()
     })).get((input)=>{
         console.log(input);
-        
         return 22
     })
 }
+
+const client = generateClient<typeof obj>(obj)
+
+client.okk({name:'anas'})
