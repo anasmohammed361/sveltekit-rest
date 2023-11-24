@@ -19,9 +19,31 @@ export class SvelteKitREST<T = undefined> {
 			schema: this.schema
 		};
 	}
+
 	post<U>(cb: (inp: T) => U) {
 		return {
 			method: 'POST',
+			cb,
+			schema: this.schema
+		};
+	}
+	put<U>(cb: (inp: T) => U) {
+		return {
+			method: 'PUT',
+			cb,
+			schema: this.schema
+		};
+	}
+	patch<U>(cb: (inp: T) => U) {
+		return {
+			method: 'PATCH',
+			cb,
+			schema: this.schema
+		};
+	}
+	delete<U>(cb: (inp: T) => U) {
+		return {
+			method: 'DELETE',
 			cb,
 			schema: this.schema
 		};
