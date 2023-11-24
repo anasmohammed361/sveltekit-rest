@@ -1,5 +1,5 @@
 {
-	"name": "svelte-api",
+	"name": "sveltekit-rest",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
@@ -9,8 +9,8 @@
 		"prepublishOnly": "npm run package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"lint": "prettier --check .",
+		"format": "prettier --write ."
 	},
 	"exports": {
 		".": {
@@ -28,18 +28,13 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/kit": "^1.20.4",
+		"@sveltejs/kit": "^1.27.4",
 		"@sveltejs/package": "^2.0.0",
-		"@typescript-eslint/eslint-plugin": "^6.0.0",
-		"@typescript-eslint/parser": "^6.0.0",
-		"eslint": "^8.28.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-svelte": "^2.30.0",
-		"prettier": "^2.8.0",
-		"prettier-plugin-svelte": "^2.10.1",
+		"prettier": "^3.0.0",
+		"prettier-plugin-svelte": "^3.0.0",
 		"publint": "^0.1.9",
-		"svelte": "^4.0.5",
-		"svelte-check": "^3.4.3",
+		"svelte": "^4.2.7",
+		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^4.4.2"
@@ -49,5 +44,6 @@
 	"type": "module",
 	"dependencies": {
 		"zod": "^3.22.4"
-	}
+	},
+	"license":"MIT"
 }

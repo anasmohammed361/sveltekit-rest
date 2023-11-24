@@ -1,13 +1,5 @@
-import { z } from "zod";
-import { API } from "./api/server";
+import { SvelteKitREST } from "./components/SvelteKitRest.js";
+import { generateClient } from "./components/client.js";
+import { generateServer } from "./components/server.js";
 
-export const api = new API();
-
-api.addRoute('power', {
-	input: z.object({ name: z.string() }),
-	invoke(input) {
-		const out = input.name + 'fuck';
-		return { out };
-	},
-	method: 'GET'
-});
+export { SvelteKitREST,generateClient,generateServer}
