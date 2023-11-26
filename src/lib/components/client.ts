@@ -2,9 +2,9 @@ import type { z } from 'zod';
 
 type Client<T> = {
 	[K in keyof T]: T[K] extends { cb: (...args: infer M) => infer U }
-	  ? (...args: M) => Promise<U>
-	:never
-  };
+		? (...args: M) => Promise<U>
+		: never;
+};
 
 export function generateClient<T>(
 	input: Record<
@@ -24,7 +24,9 @@ export function generateClient<T>(
 			const parsedInput = schema?.parse(inp);
 			if (method === 'GET') {
 				const jsonified = JSON.stringify(parsedInput);
-				const url = `${routePrefiex}/${key}?input=${encodeURIComponent(jsonified)}`;
+				const url = `${routePrefiex}/${key}${
+					parsedInput !== undefined ? `?input=${encodeURIComponent(jsonified)}` : ''
+				}`;
 				request = fetch(url);
 			} else {
 				request = fetch(`${routePrefiex}/${key}`, {

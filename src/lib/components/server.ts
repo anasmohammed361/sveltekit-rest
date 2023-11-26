@@ -23,14 +23,14 @@ export function generateServer(
 				let data: any;
 				if (currentRouteObject.method === 'GET') {
 					const input = event.url.searchParams.get('input');
-					data = JSON.parse(decodeURIComponent(input ?? ''));
+					data = input ? JSON.parse(decodeURIComponent(input ?? '')) : undefined;
 				} else {
 					data = await event.request.json();
 				}
 				const parsedData = currentRouteObject.schema?.parse(data);
 
 				const result = await currentRouteObject.cb(parsedData);
-				return json({output:result});
+				return json({ output: result });
 			} else {
 				throw error(405);
 			}
