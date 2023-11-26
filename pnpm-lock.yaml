@@ -1,13 +1,10 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
 dependencies:
-  sveltekit-rest:
-    specifier: 'link:'
-    version: 'link:'
   zod:
     specifier: ^3.22.4
     version: 3.22.4

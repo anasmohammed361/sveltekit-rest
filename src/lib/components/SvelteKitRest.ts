@@ -1,5 +1,6 @@
 import type { z } from 'zod';
-type Parameters<T> = T extends undefined ? [] : [T]
+import type { RequestEvent } from '@sveltejs/kit';
+type Params<T> = T extends undefined ? [] : [T];
 export class SvelteKitREST<T = undefined> {
 	schema: z.ZodSchema<T> | undefined;
 	constructor(inpSchema?: z.ZodSchema<T>) {
@@ -12,7 +13,7 @@ export class SvelteKitREST<T = undefined> {
 		return new SvelteKitREST<U>(inp);
 	}
 
-	get<U>(cb: (...inp: Parameters<T>) => U) {
+	get<U>(cb: (inp:{input:T,context:RequestEvent}) => U) {
 		return {
 			method: 'GET',
 			cb,
@@ -20,28 +21,28 @@ export class SvelteKitREST<T = undefined> {
 		};
 	}
 
-	post<U>(cb: (...inp: Parameters<T>) => U) {
+	post<U>(cb: (...inp: Params<T>) => U) {
 		return {
 			method: 'POST',
 			cb,
 			schema: this.schema
 		};
 	}
-	put<U>(cb: (...inp: Parameters<T>) => U) {
+	put<U>(cb: (...inp: Params<T>) => U) {
 		return {
 			method: 'PUT',
 			cb,
 			schema: this.schema
 		};
 	}
-	patch<U>(cb: (...inp: Parameters<T>) => U) {
+	patch<U>(cb: (...inp: Params<T>) => U) {
 		return {
 			method: 'PATCH',
 			cb,
 			schema: this.schema
 		};
 	}
-	delete<U>(cb: (...inp: Parameters<T>) => U) {
+	delete<U>(cb: (...inp: Params<T>) => U) {
 		return {
 			method: 'DELETE',
 			cb,
