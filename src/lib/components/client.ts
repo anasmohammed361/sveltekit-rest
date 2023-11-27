@@ -1,8 +1,11 @@
+import type { RequestEvent } from '@sveltejs/kit';
 import type { z } from 'zod';
 
+type NotNullParams<T> = T extends undefined ? [] : [T]
+
 type Client<T> = {
-	[K in keyof T]: T[K] extends { cb: (...args: infer M) => infer U }
-		? (...args: M) => Promise<U>
+	[K in keyof T]: T[K] extends { cb: (inp:{input:infer M , context: RequestEvent}) => infer U }
+		? (...input:NotNullParams<M>)=>U
 		: never;
 };
 
@@ -20,7 +23,7 @@ export function generateClient<T>(
 	const obj: any = {};
 	let request: Promise<Response>;
 	for (const [key, { cb, method, schema }] of Object.entries(input)) {
-		obj[key] = async (inp: Parameters<typeof cb>) => {
+		obj[key] = async (inp: Parameters<typeof cb>['0']['input']) => {
 			const parsedInput = schema?.parse(inp);
 			if (method === 'GET') {
 				const jsonified = JSON.stringify(parsedInput);

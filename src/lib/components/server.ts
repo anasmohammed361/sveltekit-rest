@@ -18,7 +18,6 @@ export function generateServer(
 		if (routes.includes(currentUrl)) {
 			const urlList = currentUrl.split('/');
 			const currentRouteObject = input[urlList[urlList.length - 1]];
-
 			if (event.request.method === currentRouteObject.method) {
 				let data: any;
 				if (currentRouteObject.method === 'GET') {
@@ -29,7 +28,7 @@ export function generateServer(
 				}
 				const parsedData = currentRouteObject.schema?.parse(data);
 
-				const result = await currentRouteObject.cb(parsedData);
+				const result = await currentRouteObject.cb({input:parsedData,context:event});
 				return json({ output: result });
 			} else {
 				throw error(405);

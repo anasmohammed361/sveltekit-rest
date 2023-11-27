@@ -21,28 +21,28 @@ export class SvelteKitREST<T = undefined> {
 		};
 	}
 
-	post<U>(cb: (...inp: Params<T>) => U) {
+	post<U>(cb: (inp:{input:T,context:RequestEvent}) => U) {
 		return {
 			method: 'POST',
 			cb,
 			schema: this.schema
 		};
 	}
-	put<U>(cb: (...inp: Params<T>) => U) {
+	put<U>(cb: (inp:{input:T,context:RequestEvent}) => U) {
 		return {
 			method: 'PUT',
 			cb,
 			schema: this.schema
 		};
 	}
-	patch<U>(cb: (...inp: Params<T>) => U) {
+	patch<U>(cb: (inp:{input:T,context:RequestEvent}) => U) {
 		return {
 			method: 'PATCH',
 			cb,
 			schema: this.schema
 		};
 	}
-	delete<U>(cb: (...inp: Params<T>) => U) {
+	delete<U>(cb: (inp:{input:T,context:RequestEvent}) => U) {
 		return {
 			method: 'DELETE',
 			cb,
