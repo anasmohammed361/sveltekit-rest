@@ -1,20 +1,13 @@
-import { SvelteKitREST, generateClient } from "$lib/index.js";
-import { z } from "zod";
+import { SvelteKitREST, generateClient } from '$lib/index';
+import { z } from 'zod';
 
-const rest = new SvelteKitREST()
+const rest = new SvelteKitREST();
 
-const obj = {
-    ok:rest.get(()=>{
-        return 22
-    }),
-    okk:rest.input(z.object({
-        name:z.string()
-    })).get((input)=>{
-        console.log(input);
-        return 22
-    })
-}
+export const router = {
+	hi: rest.input(z.object({ from: z.string() })).get(({ input, context }) => {
+		console.log('Input is ' + input.name);
+		return input;
+	})
+};
 
-const client = generateClient<typeof obj>(obj)
-
-client.okk({name:'anas'})
+export const client = generateClient<typeof router>(router);

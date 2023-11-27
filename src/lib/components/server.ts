@@ -1,12 +1,12 @@
 import type { z } from 'zod';
-import { json, type Handle, error } from '@sveltejs/kit';
+import { json, type Handle, error, type RequestEvent } from '@sveltejs/kit';
 
 export function generateServer(
 	input: Record<
 		string,
 		{
 			method: string;
-			cb: (inp: any) => any;
+			cb: (inp: { input: any; context: RequestEvent }) => any;
 			schema?: z.ZodSchema;
 		}
 	>,
@@ -29,7 +29,7 @@ export function generateServer(
 				}
 				const parsedData = currentRouteObject.schema?.parse(data);
 
-				const result = await currentRouteObject.cb(parsedData);
+				const result = await currentRouteObject.cb({ input: parsedData, context: event });
 				return json({ output: result });
 			} else {
 				throw error(405);

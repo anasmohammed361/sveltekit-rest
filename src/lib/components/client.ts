@@ -1,8 +1,11 @@
+import type { RequestEvent } from '@sveltejs/kit';
 import type { z } from 'zod';
 
+type OmitContext<T> = T extends { input: infer I; context: RequestEvent } ? I : never;
+
 type Client<T> = {
-	[K in keyof T]: T[K] extends { cb: (...args: infer M) => infer U }
-		? (...args: M) => Promise<U>
+	[K in keyof T]: T[K] extends { cb: (args: infer M) => infer U }
+		? (args: OmitContext<M>) => Promise<U>
 		: never;
 };
 
