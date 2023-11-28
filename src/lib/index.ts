@@ -1,5 +1,5 @@
 import { SvelteKitREST } from "./components/SvelteKitRest.js";
-import { generateClient } from "./components/client.js";
-import { generateServer } from "./components/server.js";
+import { generateREST } from "./components/generate.js";
 
-export { SvelteKitREST,generateClient,generateServer}
+
+export { SvelteKitREST,generateREST}

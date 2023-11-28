@@ -1,16 +1,9 @@
-import type { z } from 'zod';
 import { json, type Handle, error } from '@sveltejs/kit';
+import type { ClientServer } from './types.js';
 
 export function generateServer(
-	input: Record<
-		string,
-		{
-			method: string;
-			cb: (inp: any) => any;
-			schema?: z.ZodSchema;
-		}
-	>,
-	routePrefiex: `/${string}` = '/api'
+	input: ClientServer,
+	routePrefiex: `/${string}` 
 ): Handle {
 	const routes = Object.keys(input).map((elem) => `${routePrefiex}/${elem}`);
 	return async ({ event, resolve }) => {

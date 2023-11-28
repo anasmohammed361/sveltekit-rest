@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { z } from 'zod';
+import type { ClientServer } from './types.js';
 
 type NotNullParams<T> = T extends undefined ? [] : [T]
 
@@ -10,15 +10,8 @@ type Client<T> = {
 };
 
 export function generateClient<T>(
-	input: Record<
-		string,
-		{
-			method: string;
-			cb: (inp: any) => any;
-			schema?: z.ZodSchema;
-		}
-	>,
-	routePrefiex: `/${string}` = '/api'
+	input: ClientServer,
+	routePrefiex: `/${string}`
 ) {
 	const obj: any = {};
 	let request: Promise<Response>;
