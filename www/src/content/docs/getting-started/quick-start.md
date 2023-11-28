@@ -1,11 +1,22 @@
 ---
-title: Example Guide
-description: A guide in my new Starlight docs site.
+title: Quick Start
+description: Instructions to quickly get started with Sveltekit-Rest.
 ---
 
-Guides lead a user through a specific task they want to accomplish, often with a sequence of steps.
-Writing a good guide requires thinking about what your users are trying to do.
+Follow these setps to quickly getting started with Sveltekit-Rest
 
-## Further reading
+## Installation
 
-- Read [about how-to guides](https://diataxis.fr/how-to-guides/) in the Diátaxis framework
+- npm
+```bash
+npm i sveltekit-rest
+```
+- pnpm
+```bash
+pnpm add sveltekit-rest
+```
+
+
+## Setup
+
+> Yet to be implemented

@@ -17,14 +17,9 @@ export default defineConfig({
       // Each item here is one entry in the navigation menu.
       {
         label: 'Quick Start',
-        link: '/guides/example/'
+        link: '/getting-started/quick-start/'
       }]
-    }, {
-      label: 'Reference',
-      autogenerate: {
-        directory: 'reference'
-      }
-    }]
+    }, ]
   }), tailwind({
     applyBaseStyles:false
   })]
