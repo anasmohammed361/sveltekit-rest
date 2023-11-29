@@ -21,7 +21,7 @@ export class SvelteKitREST<T = undefined> {
 		return new SvelteKitREST<U>(inp);
 	}
 
-	get<U>(cb: (inp: { input: T; context: RequestEvent }) => U) {
+	get<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
 		return {
 			method: 'GET',
 			cb,
@@ -29,28 +29,28 @@ export class SvelteKitREST<T = undefined> {
 		};
 	}
 
-	post<U>(cb: (inp: { input: T; context: RequestEvent }) => U) {
+	post<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
 		return {
 			method: 'POST',
 			cb,
 			schema: this.schema
 		};
 	}
-	put<U>(cb: (inp: { input: T; context: RequestEvent }) => U) {
+	put<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
 		return {
 			method: 'PUT',
 			cb,
 			schema: this.schema
 		};
 	}
-	patch<U>(cb: (inp: { input: T; context: RequestEvent }) => U) {
+	patch<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
 		return {
 			method: 'PATCH',
 			cb,
 			schema: this.schema
 		};
 	}
-	delete<U>(cb: (inp: { input: T; context: RequestEvent }) => U) {
+	delete<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
 		return {
 			method: 'DELETE',
 			cb,

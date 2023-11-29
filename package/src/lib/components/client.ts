@@ -17,15 +17,16 @@ export function generateClient<T>(
 }
 
 
-function handleNestedClient<T>(input:RecordValue,key:string,routePrefiex:`/${string}`) {
+function handleNestedClient<T>(input:RecordValue,key:string,routePrefiex:`/${string}`) {	
 	const obj:any ={}
 	for(const [nestedKey,value] of Object.entries(input)){
-		if ('method' in value) {
-			obj[key] = handleClient(value as PerRoute,`${key}.${nestedKey}`,routePrefiex)
+		if ('method' in value && 'cb' in value) {
+			obj[nestedKey] = handleClient(value as PerRoute,`${key}.${nestedKey}`,routePrefiex)
 		}else{
-			obj[key] = handleNestedClient(value,`${key}.${nestedKey}`,routePrefiex)
+			obj[nestedKey] = handleNestedClient<typeof obj[typeof key]>(value,`${key}.${nestedKey}`,routePrefiex)
 		}
 	}
+
 	return obj as Client<T>
 }
 
@@ -51,9 +52,12 @@ function handleClient(input:PerRoute,key:string,routePrefiex:`/${string}`) {
 		}
 
 		const response = await request;
-
+		
+		
 		if (response.ok) {
 			const result = await response.json();
+			console.log(result);
+			
 			return result?.output;
 		} else {
 			throw new Error(await response.text());
