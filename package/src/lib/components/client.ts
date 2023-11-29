@@ -56,8 +56,6 @@ function handleClient(input:PerRoute,key:string,routePrefiex:`/${string}`) {
 		
 		if (response.ok) {
 			const result = await response.json();
-			console.log(result);
-			
 			return result?.output;
 		} else {
 			throw new Error(await response.text());
