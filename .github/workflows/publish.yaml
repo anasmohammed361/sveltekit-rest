@@ -4,12 +4,10 @@ on:
   release:
     types:
       - "created"
-      - "published"
-      - "edited"
     
 defaults:
   run:
-    working-directory: ./package
+    working-directory: package
 
 jobs:
   publish:
