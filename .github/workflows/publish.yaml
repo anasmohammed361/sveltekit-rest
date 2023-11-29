@@ -1,9 +1,9 @@
 name: publish sveltekit-rest
 
 on:
-  push:
-    branches:
-      - "main"
+  release:
+    types:
+      - "created"
     
 defaults:
   run:
