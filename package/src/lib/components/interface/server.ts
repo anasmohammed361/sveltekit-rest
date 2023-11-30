@@ -1,7 +1,7 @@
 import { json, type Handle, error } from '@sveltejs/kit';
-import type { ClientServer, PerRoute, RecordValue } from './types.js';
+import type { Router, SingleOrMultipleRoutes ,Route} from '../types.js';
 
-export function generateServer(input: ClientServer, routePrefiex: `/${string}`): Handle {
+export function createServerHandle(input: Router, routePrefiex: `/${string}`): Handle {
 	return async ({ event, resolve }) => {
 		const url = event.url.pathname;
 		if (url.startsWith(routePrefiex)) {
@@ -30,20 +30,20 @@ export function generateServer(input: ClientServer, routePrefiex: `/${string}`):
 	};
 }
 
-function getCurrentObject(obj: ClientServer, keys: string[]) { 
+function getCurrentObject(obj: Router, keys: string[]) { 
 	if (keys.length <= 0) {
 		return undefined;
 	}
-	let currentObj: RecordValue | PerRoute | undefined = obj[keys.shift()!];
+	let currentObj: SingleOrMultipleRoutes | Route | undefined = obj[keys.shift()!];
 	for (const key of keys) {
 		if (currentObj && typeof currentObj === 'object' && key in currentObj) {
-			currentObj = currentObj?.[key as keyof typeof currentObj] as RecordValue | undefined;
+			currentObj = currentObj?.[key as keyof typeof currentObj] as SingleOrMultipleRoutes | undefined;
 		} else {
 			return undefined;
 		}
 	}
 	if (currentObj && 'cb' in currentObj && 'method' in currentObj) {
-		return currentObj as PerRoute;
+		return currentObj as Route;
 	} else {
 		return undefined;
 	}

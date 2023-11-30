@@ -1,14 +1,14 @@
-import type { Client, ClientServer, PerRoute, RecordValue } from './types.js';
+import type { Client, Router, Route, SingleOrMultipleRoutes } from '../types.js';
 
-export function generateClient<T>(
-	input: ClientServer,
+export function createClient<T>(
+	input: Router,
 	routePrefiex: `/${string}`
 ) {
 	const obj: any = {};
 
 	for (const [key, value] of Object.entries(input)) {
 		if ('method' in value && 'cb' in value) {
-			obj[key] = handleClient(value as PerRoute,key,routePrefiex)
+			obj[key] = handleClient(value as Route,key,routePrefiex)
 		}else{
 			obj[key] = handleNestedClient<typeof value>(value,key,routePrefiex)
 		}
@@ -16,12 +16,11 @@ export function generateClient<T>(
 	return obj as Client<T>;
 }
 
-
-function handleNestedClient<T>(input:RecordValue,key:string,routePrefiex:`/${string}`) {	
+function handleNestedClient<T>(input:SingleOrMultipleRoutes,key:string,routePrefiex:`/${string}`) {	
 	const obj:any ={}
 	for(const [nestedKey,value] of Object.entries(input)){
 		if ('method' in value && 'cb' in value) {
-			obj[nestedKey] = handleClient(value as PerRoute,`${key}.${nestedKey}`,routePrefiex)
+			obj[nestedKey] = handleClient(value as Route,`${key}.${nestedKey}`,routePrefiex)
 		}else{
 			obj[nestedKey] = handleNestedClient<typeof obj[typeof key]>(value,`${key}.${nestedKey}`,routePrefiex)
 		}
@@ -30,7 +29,7 @@ function handleNestedClient<T>(input:RecordValue,key:string,routePrefiex:`/${str
 	return obj as Client<T>
 }
 
-function handleClient(input:PerRoute,key:string,routePrefiex:`/${string}`) {
+function handleClient(input:Route,key:string,routePrefiex:`/${string}`) {
 	const { cb, method, schema } = input
 	return async (inp: Parameters<typeof cb>['0']['input']) => {
 		let request: Promise<Response>;

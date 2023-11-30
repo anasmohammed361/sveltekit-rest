@@ -1,60 +1,71 @@
-import type { z } from 'zod';
-import type { RequestEvent } from '@sveltejs/kit';
+import { z } from 'zod';
+import type { Route, RouteMethod, RouteMethodInput } from './types.js';
+
 type Options = {
-	contentType:string,
-	headers:{
-		client:Record<string,string>,
-		server:Record<string,string>
+	contentType: string;
+	headers: {
+		client: Record<string, string>;
+		server: Record<string, string>;
+	};
+};
+
+class SvelteKitREST {
+	public get: RouteMethod<undefined>;
+	public post: RouteMethod<undefined>;
+	public put: RouteMethod<undefined>;
+	public delete: RouteMethod<undefined>;
+	constructor() {
+		const router = this.getRouter<undefined>(z.undefined());
+		this.get = router.get;
+		this.post = router.post;
+		this.put = router.put;
+		this.delete = router.delete;
+	}
+	input<U>(inp: z.ZodSchema<U>) {
+		return this.getRouter<U>(inp);
+	}
+	private getRouter<T>(schema: z.ZodSchema<T>) {
+		return {
+			get: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+				return {
+					method: 'GET',
+					cb,
+					schema: schema
+				};
+			},
+
+			post: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+				return {
+					method: 'POST',
+					cb,
+					schema: schema
+				};
+			},
+			put: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+				return {
+					method: 'PUT',
+					cb,
+					schema: schema
+				};
+			},
+			patch: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+				return {
+					method: 'PATCH',
+					cb,
+					schema: schema
+				};
+			},
+			delete: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+				return {
+					method: 'DELETE',
+					cb,
+					schema: schema
+				};
+			}
+		};
 	}
 }
 
-export class SvelteKitREST<T = undefined> {
-	schema: z.ZodSchema<T> | undefined;
-
-	constructor(inpSchema?: z.ZodSchema<T>) {
-		if (inpSchema) {
-			this.schema = inpSchema;
-		}
-	}
-
-	input<U>(inp: z.ZodSchema<U>) {
-		return new SvelteKitREST<U>(inp);
-	}
-
-	get<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
-		return {
-			method: 'GET',
-			cb,
-			schema: this.schema
-		};
-	}
-
-	post<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
-		return {
-			method: 'POST',
-			cb,
-			schema: this.schema
-		};
-	}
-	put<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
-		return {
-			method: 'PUT',
-			cb,
-			schema: this.schema
-		};
-	}
-	patch<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
-		return {
-			method: 'PATCH',
-			cb,
-			schema: this.schema
-		};
-	}
-	delete<U>(cb: (inp: { input: T; context:{event:RequestEvent} }) => U) {
-		return {
-			method: 'DELETE',
-			cb,
-			schema: this.schema
-		};
-	}
+export function initSveltekitRest() {
+	return new SvelteKitREST()
 }
