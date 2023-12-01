@@ -39,7 +39,7 @@ export function createServerHandle<T>(
 				const context = getContext ? getContext(event):undefined; // cachedContext
 				const result = await currentRouteObject.cb({
 					input: parsedData,
-					context: context == undefined ? {event} : context
+					context: context ? context : {event}
 				});
 				return json({ output: result });
 			} else {
