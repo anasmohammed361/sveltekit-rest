@@ -9,7 +9,7 @@ type Options = {
 	};
 };
 
-class SvelteKitREST {
+class SvelteKitREST<Ttop = undefined> {
 	public get;
 	public post;
 	public put;
@@ -21,12 +21,18 @@ class SvelteKitREST {
 		this.put = router.put;
 		this.delete = router.delete;
 	}
+
 	input<U>(inp: z.ZodSchema<U>) {
 		return this.getRouter<U>(inp);
 	}
 	private getRouter<T>(schema: z.ZodSchema<T>) {
 		return {
-			get: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U): Route<T, U>=> {
+			get: <U>(
+				cb: (inp: {
+					context: Ttop extends undefined ? { event: RequestEvent } : Ttop;
+					input: T;
+				}) => U
+			): Route<T, U, Ttop> => {
 				return {
 					method: 'GET',
 					cb,
@@ -34,28 +40,28 @@ class SvelteKitREST {
 				};
 			},
 
-			post: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U):Route<T, U> => {
+			post: <U>(cb: (inp: { context: Ttop extends undefined ? { event: RequestEvent } : Ttop; input: T }) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'POST',
 					cb,
 					schema: schema
 				};
 			},
-			put: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U):Route<T, U> => {
+			put: <U>(cb: (inp: { context: Ttop extends undefined ? { event: RequestEvent } : Ttop; input: T }) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'PUT',
 					cb,
 					schema: schema
 				};
 			},
-			patch: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U): Route<T, U> => {
+			patch: <U>(cb: (inp: { context: Ttop extends undefined ? { event: RequestEvent } : Ttop; input: T }) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'PATCH',
 					cb,
 					schema: schema
 				};
 			},
-			delete: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U): Route<T, U> => {
+			delete: <U>(cb: (inp: { context: Ttop extends undefined ? { event: RequestEvent } : Ttop; input: T }) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'DELETE',
 					cb,
@@ -66,6 +72,16 @@ class SvelteKitREST {
 	}
 }
 
-export function initSveltekitRest() {
-	return new SvelteKitREST();
-}
+
+
+
+
+export const initSveltekitRest = {
+	withContext: <T>() : { create: () => SvelteKitREST<T> } => ({
+        create: () => new SvelteKitREST<T>()
+    }),
+	create: (): SvelteKitREST<undefined> => {
+		return new SvelteKitREST<undefined>();
+	}
+};
+
