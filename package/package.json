@@ -45,6 +45,7 @@
 	"types": "./dist/index.d.ts",
 	"type": "module",
 	"dependencies": {
+		"sveltekit-rest": "link:",
 		"zod": "^3.22.4"
 	},
 	"license": "MIT",
