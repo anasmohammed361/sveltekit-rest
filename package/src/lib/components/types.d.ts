@@ -1,14 +1,14 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import type { ResolvedUrl } from 'vite';
 import type { z } from 'zod';
-type Route = {
+type Route<T,U> = {
 	method: string;
-	cb: (inp: any) => any;
+	cb: (inp: { input: T; context: { event: RequestEvent } }) => U;
 	schema: z.ZodSchema | undefined;
 };
-type SingleOrMultipleRoutes = Route | Record<string, Route>;
+type SingleOrMultipleRoutes = Route<any,any> | Record<string, Route>;
 
-type Router = Record<string, SingleOrMultipleRoutes>;
+// type Router = Record<string, SingleOrMultipleRoutes>;
 type NotNullParams<T> = T extends undefined ? [] : [T];
 type Client<T> = {
 	[K in keyof T]: T[K] extends {
@@ -20,7 +20,5 @@ type Client<T> = {
 		  : never;
 };
 
-type RouteMethodInput<T> = T extends undefined
-	? { context: { event: RequestEvent } }
-	: { context: { event: RequestEvent }; input: T };
+
 type RouteMethod<T> = <U>(cb: (inp: RouteMethodInput<T>) => U) => Route;

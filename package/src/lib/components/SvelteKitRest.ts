@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import type { Route, RouteMethod, RouteMethodInput } from './types.js';
-
+import type { Route, RouteMethod } from './types.js';
+import type { RequestEvent } from '@sveltejs/kit';
 type Options = {
 	contentType: string;
 	headers: {
@@ -10,10 +10,10 @@ type Options = {
 };
 
 class SvelteKitREST {
-	public get: RouteMethod<undefined>;
-	public post: RouteMethod<undefined>;
-	public put: RouteMethod<undefined>;
-	public delete: RouteMethod<undefined>;
+	public get;
+	public post;
+	public put;
+	public delete;
 	constructor() {
 		const router = this.getRouter<undefined>(z.undefined());
 		this.get = router.get;
@@ -26,7 +26,7 @@ class SvelteKitREST {
 	}
 	private getRouter<T>(schema: z.ZodSchema<T>) {
 		return {
-			get: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+			get: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U): Route<T, U>=> {
 				return {
 					method: 'GET',
 					cb,
@@ -34,28 +34,28 @@ class SvelteKitREST {
 				};
 			},
 
-			post: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+			post: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U):Route<T, U> => {
 				return {
 					method: 'POST',
 					cb,
 					schema: schema
 				};
 			},
-			put: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+			put: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U):Route<T, U> => {
 				return {
 					method: 'PUT',
 					cb,
 					schema: schema
 				};
 			},
-			patch: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+			patch: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U): Route<T, U> => {
 				return {
 					method: 'PATCH',
 					cb,
 					schema: schema
 				};
 			},
-			delete: <U>(cb: (inp: RouteMethodInput<T>) => U): Route => {
+			delete: <U>(cb: (inp: { context: { event: RequestEvent }; input: T }) => U): Route<T, U> => {
 				return {
 					method: 'DELETE',
 					cb,
@@ -67,5 +67,5 @@ class SvelteKitREST {
 }
 
 export function initSveltekitRest() {
-	return new SvelteKitREST()
+	return new SvelteKitREST();
 }
