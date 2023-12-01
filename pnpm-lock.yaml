@@ -88,6 +88,9 @@ importers:
 
   package:
     dependencies:
+      sveltekit-rest:
+        specifier: 'link:'
+        version: 'link:'
       zod:
         specifier: ^3.22.4
         version: 3.22.4

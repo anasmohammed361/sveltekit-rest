@@ -1,19 +1,18 @@
 import { json, type Handle, error, type RequestEvent } from '@sveltejs/kit';
 import type { SingleOrMultipleRoutes, Route } from '../types.js';
 
-export function createServerHandle(
+export function createServerHandle<T>(
 	input: Record<string, SingleOrMultipleRoutes>,
-	createContext: (event: RequestEvent) => object | undefined,
-	routePrefiex: `/${string}`
+	routePrefiex: `/${string}`,
+	createContext?: (event: RequestEvent) => T
 ): Handle {
-
 	/* Caching the createContext might be good idea to avoid called db instances upon every request*/
 
 	const createCachedContext = () => {
-		let cachedContext: ReturnType<typeof createContext> | undefined;
+		let cachedContext: T | undefined;
 
 		return (event: RequestEvent) => {
-			if (!cachedContext) cachedContext = createContext(event);
+			if (!cachedContext) cachedContext = createContext ? createContext(event) : undefined;
 			return cachedContext;
 		};
 	};
@@ -37,10 +36,10 @@ export function createServerHandle(
 					data = await event.request.json();
 				}
 				const parsedData = currentRouteObject.schema?.parse(data);
-				let context = getContext(event); // cachedContext
+				const context = getContext ? getContext(event):undefined; // cachedContext
 				const result = await currentRouteObject.cb({
 					input: parsedData,
-					context: context == undefined ? event : context
+					context: context == undefined ? {event} : context
 				});
 				return json({ output: result });
 			} else {
