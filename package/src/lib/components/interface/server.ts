@@ -11,8 +11,19 @@ export function createServerHandle<T>(
 	const createCachedContext = () => {
 		let cachedContext: T | undefined;
 
-		return (event: RequestEvent) => {
-			if (!cachedContext) cachedContext = createContext ? createContext(event) : undefined;
+		return async (event: RequestEvent) => {
+			// if (!cachedContext) cachedContext = createContext ? createContext(event) : undefined;
+			if (!cachedContext) {
+				cachedContext = createContext ? createContext(event) : undefined;
+				if (cachedContext instanceof Promise) {
+					console.log('Context is promise type');
+					cachedContext
+						.then((val) => {
+							cachedContext = val;
+						})
+						.catch((err) => console.log(err));
+				}
+			}
 			return cachedContext;
 		};
 	};
@@ -36,10 +47,10 @@ export function createServerHandle<T>(
 					data = await event.request.json();
 				}
 				const parsedData = currentRouteObject.schema?.parse(data);
-				const context = getContext ? getContext(event):undefined; // cachedContext
+				const context = getContext ? await getContext(event) : undefined; // cachedContext
 				const result = await currentRouteObject.cb({
 					input: parsedData,
-					context: context ? context : {event}
+					context: context ? context : { event }
 				});
 				return json({ output: result });
 			} else {
