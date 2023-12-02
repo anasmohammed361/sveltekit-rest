@@ -1,16 +1,19 @@
-name: publish sveltekit-rest
+name: Test
 
 on:
-  release:
-    types:
-      - "created"
-    
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 defaults:
   run:
     working-directory: package
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,12 +25,8 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.10.0'
-          registry-url: 'https://registry.npmjs.org'
-          cache : 'pnpm'
+          node-version: "20.10.0"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
       - run: pnpm install
-      - run: pnpm publish
-        # env:
-        #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        #   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        
+      - run: pnpm test
