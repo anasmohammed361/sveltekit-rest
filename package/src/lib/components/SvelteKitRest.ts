@@ -8,7 +8,6 @@ type Options = {
 		server: Record<string, string>;
 	};
 };
-type TContext<T> = T extends undefined ? RequestEvent : T;
 class SvelteKitREST<Ttop = undefined> {
 	public get;
 	public post;
@@ -25,7 +24,7 @@ class SvelteKitREST<Ttop = undefined> {
 	input<U>(inp: z.ZodSchema<U>) {
 		return this.getRouter<U>(inp);
 	}
-	private getRouter<T>(schema?: z.ZodSchema<T> | undefined) {
+	private getRouter<T>(schema?: z.ZodSchema<T>) {
 		return {
 			get: <U>(
 				cb: (
