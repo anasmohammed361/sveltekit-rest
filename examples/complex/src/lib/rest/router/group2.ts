@@ -1,7 +1,6 @@
 import { initSveltekitRest } from "sveltekit-rest";
 import { z } from "zod";
-
-const r = initSveltekitRest.create()
+import { r } from "./router";
 
 export const groupTwoRouter = {
     one:r.input(z.object({name:z.string()})).get(({input})=>{

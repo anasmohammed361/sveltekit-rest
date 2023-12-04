@@ -22,9 +22,8 @@ pnpm add sveltekit-rest
 ```ts
 // src/lib/rest/router.ts
 import { initSveltekitRest } from "sveltekit-rest";
-import { z } from "zod";
 
-const r = initSveltekitRest();
+const r = initSveltekitRest.create();
 
 export const router = {
 

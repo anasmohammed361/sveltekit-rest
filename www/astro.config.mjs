@@ -18,8 +18,26 @@ export default defineConfig({
       {
         label: 'Quick Start',
         link: '/getting-started/quick-start/'
-      }]
-    }, ]
+      },
+      {
+        label: 'Input Validation',
+        link: '/getting-started/input-validation/'
+      },
+      {
+        label: 'Routing',
+        link: '/getting-started/routing-basics/'
+      }
+    ]
+    }, 
+    {
+      label:"Configuration",
+      autogenerate:{
+        directory:"config"
+      }
+    }
+  
+  
+  ]
   }), tailwind({
     applyBaseStyles:false
   })]

@@ -2,7 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { ResolvedUrl } from 'vite';
 import type { z } from 'zod';
 
-type TContext<T> = T extends undefined ? RequestEvent : ContextReturnType<T>;
+type TContext<T> = T extends undefined ? {event:RequestEvent} : ContextReturnType<T>;
 
 type Params<T, U> = T extends undefined
 	? { context: TContext<U> }
