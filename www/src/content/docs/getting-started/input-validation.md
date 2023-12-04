@@ -21,7 +21,8 @@ pnpm add zod
 
 You can add inputs to you REST endpoints by invoking the `input` method.
 
-```ts {1 ,4-7} 
+```ts {2 ,5-8} 
+#lib/rest/router.ts
 import { z } from "zod";
 export const router = {
   route: 

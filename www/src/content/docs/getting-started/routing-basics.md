@@ -6,7 +6,8 @@ description: Setting up a router with Sveltekit-Rest.
 ## Router
 The router object has all the routes and the corresponding configurations.
 
-```ts {7,10}
+```ts {8,11}
+# lib/rest/router.ts
 import { initSveltekitRest } from "sveltekit-rest";
 import { z } from "zod";
 
