@@ -57,8 +57,6 @@ function handleClient(input: Route<any, any, any>, key: string, routePrefiex: `/
 	const { cb, method, schema } = input;
 	return async (inp: Parameters<typeof cb>['0'] extends {context:unknown,input:unknown} ? Parameters<typeof cb>['0']['input'] : undefined ) => {
 		let request: Promise<Response>;
-		console.log(inp);
-
 		const parsedInput = schema?.parse(inp);
 		if (method === 'GET') {
 			const jsonified = JSON.stringify(parsedInput);

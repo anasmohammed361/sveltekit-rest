@@ -1,10 +1,10 @@
 import { json, type Handle, error, type RequestEvent } from '@sveltejs/kit';
-import type { SingleOrMultipleRoutes, Route } from '../types.js';
+import type { SingleOrMultipleRoutes, Route, Context } from '../types.js';
 
 export function createServerHandle<T>(
 	input: Record<string, SingleOrMultipleRoutes>,
 	routePrefiex: `/${string}`,
-	createContext?: (event: RequestEvent) => T
+	createContext?: Context<T>
 ): Handle {
 	/* Caching the createContext might be good idea to avoid called db instances upon every request*/
 
@@ -12,9 +12,8 @@ export function createServerHandle<T>(
 		let cachedContext: T | undefined;
 
 		return async (event: RequestEvent) => {
-			// if (!cachedContext) cachedContext = createContext ? createContext(event) : undefined;
 			if (!cachedContext) {
-				cachedContext = createContext ? createContext(event) : undefined;
+				cachedContext = createContext ? await  createContext(event) : undefined;
 				if (cachedContext instanceof Promise) {
 					console.log('Context is promise type');
 					cachedContext
@@ -47,10 +46,12 @@ export function createServerHandle<T>(
 					data = await event.request.json();
 				}
 				const parsedData = currentRouteObject.schema?.parse(data);
-				const context = getContext ? await getContext(event) : undefined; // cachedContext
+				const cachedContext = getContext ? await getContext(event) : undefined; // cachedContext
+				const context = cachedContext ? cachedContext : { event }
+				const middlewaredContext =await handleMiddlewares(context,currentRouteObject.middlewares)
 				const result = await currentRouteObject.cb({
 					input: parsedData,
-					context: context ? context : { event }
+					context: middlewaredContext
 				});
 				return json({ output: result });
 			} else {
@@ -80,4 +81,13 @@ function getCurrentObject(obj: Record<string, SingleOrMultipleRoutes>, keys: str
 	} else {
 		return undefined;
 	}
+}
+
+async function handleMiddlewares(currentContext:any,middlewares:((...inp:any)=>any)[]){
+	let context = {...currentContext}
+	for (const middleware of middlewares) {
+		const result = await middleware({context})
+		context = {...context,...result}
+	}
+	return context
 }

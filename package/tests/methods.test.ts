@@ -6,6 +6,7 @@ describe('HTTP Methods Inputs',()=>{
     describe('get',()=>{
         const t = initSveltekitRest.create();
         test('without Inputs',()=>{
+            //@ts-ignore
             t.get(({input})=>{
                     expect(input).toBe(undefined)
             })
@@ -23,6 +24,7 @@ describe('HTTP Methods Inputs',()=>{
     describe('get',()=>{
         const t = initSveltekitRest.create();
         test('without Inputs',()=>{
+              //@ts-ignore
             t.get(({input})=>{
                     expect(input).toBe(undefined)
             })
@@ -40,6 +42,7 @@ describe('HTTP Methods Inputs',()=>{
     describe('post',()=>{
         const t = initSveltekitRest.create();
         test('without Inputs',()=>{
+            //@ts-ignore
             t.post(({input})=>{
                     expect(input).toBe(undefined)
             })
@@ -57,6 +60,7 @@ describe('HTTP Methods Inputs',()=>{
     describe('put',()=>{
         const t = initSveltekitRest.create();
         test('without Inputs',()=>{
+              //@ts-ignore
             t.put(({input})=>{
                     expect(input).toBe(undefined)
             })
@@ -74,6 +78,7 @@ describe('HTTP Methods Inputs',()=>{
     describe('delete',()=>{
         const t = initSveltekitRest.create();
         test('without Inputs',()=>{
+              //@ts-ignore
             t.delete(({input})=>{
                     expect(input).toBe(undefined)
             })

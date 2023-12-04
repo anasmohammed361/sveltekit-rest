@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import type { Route, RouteMethod, Params } from './types.js';
+import type { Route, RouteMethod, Params, TContext, CombineTypes } from './types.js';
 import type { RequestEvent } from '@sveltejs/kit';
 type Options = {
 	contentType: string;
@@ -13,65 +13,76 @@ class SvelteKitREST<Ttop = undefined> {
 	public post;
 	public put;
 	public delete;
-	constructor() {
+	private middlewares: ((inp: {}) => any)[] = [];
+	private constructor() {
 		const router = this.getRouter<undefined>();
 		this.get = router.get;
 		this.post = router.post;
 		this.put = router.put;
 		this.delete = router.delete;
 	}
+	static init<T = undefined>() {
+		return new SvelteKitREST<T>();
+	}
+	private static getMiddlewareInstance<T>(
+		existingMiddlewares: ((inp: {}) => any)[],
+		currentMiddleware: (inp: any) => any
+	) {
+		const instance = new SvelteKitREST<T>();
+		instance.middlewares = [...existingMiddlewares, currentMiddleware];
+		return instance;
+	}
 
 	input<U>(inp: z.ZodSchema<U>) {
 		return this.getRouter<U>(inp);
 	}
+
+	middleware<U>(func: (inp: { context: TContext<Ttop> }) => U) {
+		const middlewares = this.middlewares;
+		return SvelteKitREST.getMiddlewareInstance<CombineTypes<TContext<Ttop>,Awaited<U>>>(middlewares, func);
+	}
+
 	private getRouter<T>(schema?: z.ZodSchema<T>) {
 		return {
-			get: <U>(
-				cb: (
-					inp: Params<T, Ttop>
-				) => U
-			): Route<T, U, Ttop> => {
+			get: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'GET',
 					cb,
-					schema: schema
+					schema: schema,
+					middlewares:this.middlewares
 				};
 			},
 
-			post: <U>(
-				cb: (inp: Params<T, Ttop>) => U
-			): Route<T, U, Ttop> => {
+			post: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'POST',
 					cb,
-					schema: schema
+					schema: schema,
+					middlewares:this.middlewares
 				};
 			},
-			put: <U>(
-				cb: (inp: Params<T, Ttop>) => U
-			): Route<T, U, Ttop> => {
+			put: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'PUT',
 					cb,
-					schema: schema
+					schema: schema,
+					middlewares:this.middlewares
 				};
 			},
-			patch: <U>(
-				cb: (inp: Params<T, Ttop>) => U
-			): Route<T, U, Ttop> => {
+			patch: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'PATCH',
 					cb,
-					schema: schema
+					schema: schema,
+					middlewares:this.middlewares
 				};
 			},
-			delete: <U>(
-				cb: (inp: Params<T, Ttop>) => U
-			): Route<T, U, Ttop> => {
+			delete: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
 				return {
 					method: 'DELETE',
 					cb,
-					schema: schema
+					schema: schema,
+					middlewares:this.middlewares
 				};
 			}
 		};
@@ -80,9 +91,9 @@ class SvelteKitREST<Ttop = undefined> {
 
 export const initSveltekitRest = {
 	withContext: <T>(): { create: () => SvelteKitREST<T> } => ({
-		create: () => new SvelteKitREST<T>()
+		create: () => SvelteKitREST.init<T>()
 	}),
 	create: (): SvelteKitREST<undefined> => {
-		return new SvelteKitREST<undefined>();
+		return SvelteKitREST.init();
 	}
 };
