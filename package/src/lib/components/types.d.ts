@@ -68,6 +68,5 @@ type CombineTypes<A, B> = {
 type TCache = {
 	lastTime: number;
 	staleTime: number;
-	
 	data?: any;
 };

@@ -85,6 +85,19 @@ function handleClient<T, U, Ttop>(
 ) {
 	const { cb } = route;
 
+	const readableStore = (
+		initValue: TOutput<typeof route>,
+		writableStore: Writable<TOutput<typeof route>>
+	) => {
+		return readable<TOutput<typeof route>>(initValue, (set) => {
+			const unsubscribe = writableStore.subscribe((value) => {
+				set(value);
+			});
+
+			return () => unsubscribe();
+		});
+	};
+
 	return (
 		inp: Parameters<typeof cb>['0'] extends { context: unknown; route: unknown }
 			? Parameters<typeof cb>['0']['route']
@@ -116,32 +129,17 @@ function handleClient<T, U, Ttop>(
 				if (time - currentCache.lastTime > 3 * 60 * 100) {
 					cache.delete(key);
 				}
-				if (
-					time <= currentCache.staleTime &&
-					!(time - currentCache.lastTime > 3 * 60 * 100)
-				) {
+				if (time <= currentCache.staleTime && !(time - currentCache.lastTime > 3 * 60 * 100)) {
 					currentCache.lastTime = time;
 
-					return readable<TOutput<typeof route>>(undefined, (set, update) => {
-						set(initialStoreValue);
-
-						writableStore.subscribe((value) => {
-							update((_) => value);
-						});
-					});
+					return readableStore(initialStoreValue, writableStore);
 				}
 			}
 		}
 
 		resolveRequest<T, U, Ttop>(route, key, routePrefix, inp, writableStore, staleTime);
 
-		return readable<TOutput<typeof route>>(undefined, (set, update) => {
-			set(initialStoreValue);
-
-			writableStore.subscribe((value) => {
-				update((_) => value);
-			});
-		});
+		return readableStore(initialStoreValue, writableStore);
 	};
 }
 

@@ -1,3 +1,1 @@
-
-
 <p>SVELTEKIT-REST</p>
