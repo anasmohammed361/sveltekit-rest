@@ -1,25 +1,33 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { Context, SingleOrMultipleRoutes } from '../types.js';
+import type { ContextFn, Router, SingleOrMultipleRoutes } from '../types.js';
 import { createClient } from './client.js';
 import { createServerHandle } from './server.js';
 
-
 /**
- * @param {Record<string, SingleOrMultipleRoutes>} input
- * @param {{
- * createContext?: Context<any>;
- * routePrefiex?: `/${string}`
- * }} 
- * @returns {{client: any;serverHook: any;}}
+ * Creates a REST interface using the specified routes, allowing client and server interactions.
+ * @param {Router} routes - The router object defining the REST endpoints.
+ * @param {
+ *   createContext?: Context<any>; // Optional function to create context
+ *   routePrefiex?: `/${string}`; // Optional prefix for routes (defaults to '/api')
+ * }} options - Additional options for creating the REST interface.
+ * @returns {{
+ *   client: any; // The client object for REST interactions.
+ *   serverHook: any; // The server hook object for REST handling.
+ * }}
  */
-export function createRESTInterface<T>(input: Record<string,SingleOrMultipleRoutes>,options:{ createContext?:Context<any> , 
-	/** Default to /api */
-	routePrefiex?: `/${string}`}={}) {
-	if (!options.routePrefiex) {
-		options.routePrefiex = "/api"
+export function createRESTInterface<T>(
+	routes: Router,
+	opts: {
+		createContext?: ContextFn<any>;
+		/** Default to /api */
+		routePrefix?: `/${string}`;
+	} = {}
+) {
+	if (!opts.routePrefix) {
+		opts.routePrefix = '/api';
 	}
 	return {
-		client: createClient<T>(input, options.routePrefiex),
-		serverHook: createServerHandle<any>(input,options.routePrefiex,options.createContext) // createContext makes user to use db on routes.
+		client: createClient<T>(routes, opts.routePrefix),
+		RestHandle: createServerHandle<any>(routes, opts.routePrefix, opts.createContext) // createContext makes user to use db on routes.
 	};
 }
