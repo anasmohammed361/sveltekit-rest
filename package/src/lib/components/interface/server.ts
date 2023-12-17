@@ -1,33 +1,32 @@
 import { json, type Handle, error, type RequestEvent } from '@sveltejs/kit';
-import type { SingleOrMultipleRoutes, Route, Context } from '../types.js';
+import type { SingleOrMultipleRoutes, Route, Context, Options } from '../types.js';
+import { handleCacheControl } from '../options.js';
 
 export function createServerHandle<T>(
 	input: Record<string, SingleOrMultipleRoutes>,
 	routePrefiex: `/${string}`,
-	createContext?: Context<T>
+	createContext?: Context<T>,
+	cacheContext: boolean = false
 ): Handle {
+	// Regular Context with no cache
+	const createNonCachedContext = () => {
+		return async (event: RequestEvent) => {
+			const context = createContext ? await createContext(event) : undefined;
+			return context;
+		};
+	};
 	/* Caching the createContext might be good idea to avoid called db instances upon every request*/
-
 	const createCachedContext = () => {
 		let cachedContext: T | undefined;
-
 		return async (event: RequestEvent) => {
 			if (!cachedContext) {
-				cachedContext = createContext ? await  createContext(event) : undefined;
-				if (cachedContext instanceof Promise) {
-					console.log('Context is promise type');
-					cachedContext
-						.then((val) => {
-							cachedContext = val;
-						})
-						.catch((err) => console.log(err));
-				}
+				cachedContext = createContext ? await createContext(event) : undefined;
 			}
 			return cachedContext;
 		};
 	};
 
-	const getContext = createCachedContext();
+	const getContext = cacheContext ? createCachedContext() : createNonCachedContext();
 
 	return async ({ event, resolve }) => {
 		const url = event.url.pathname;
@@ -45,15 +44,25 @@ export function createServerHandle<T>(
 				} else {
 					data = await event.request.json();
 				}
+
 				const parsedData = currentRouteObject.schema?.parse(data);
-				const cachedContext = getContext ? await getContext(event) : undefined; // cachedContext
-				const context = cachedContext ? cachedContext : { event }
-				const middlewaredContext =await handleMiddlewares(context,currentRouteObject.middlewares)
+				const obtainedContext = await getContext(event); // cachedContext
+				const context = obtainedContext ? obtainedContext : { event };
+				const middlewaredContext = await handleMiddlewares(context, currentRouteObject.middlewares);
 				const result = await currentRouteObject.cb({
 					input: parsedData,
 					context: middlewaredContext
 				});
-				return json({ output: result });
+				//handling custom headers and options
+				const headers = handleOptions(currentRouteObject.options);
+
+				//Return json
+				return json(
+					{ output: result },
+					{
+						headers
+					}
+				);
 			} else {
 				throw error(405);
 			}
@@ -76,18 +85,28 @@ function getCurrentObject(obj: Record<string, SingleOrMultipleRoutes>, keys: str
 			return undefined;
 		}
 	}
-	if (currentObj && 'cb' in currentObj && 'method' in currentObj) {
+	if (currentObj && 'cb' in currentObj && 'method' in currentObj && 'schema' in currentObj) {
 		return currentObj as Route<any, any, any>;
 	} else {
 		return undefined;
 	}
 }
 
-async function handleMiddlewares(currentContext:any,middlewares:((...inp:any)=>any)[]){
-	let context = {...currentContext}
+async function handleMiddlewares(currentContext: any, middlewares: ((...inp: any) => any)[]) {
+	let context = { ...currentContext };
 	for (const middleware of middlewares) {
-		const result = await middleware({context})
-		context = {...context,...result}
+		const result = await middleware({ context });
+		context = { ...context, ...result };
 	}
-	return context
+	return context;
+}
+
+function handleOptions(options?: Partial<Options>):Record<string,any> {
+	let cacheControl: string = '';
+	if (options?.cacheControl) {
+		cacheControl = `max-age=${handleCacheControl(options.cacheControl)}`;
+	}
+	const headers = options?.responseHeaders ? options.responseHeaders : {};
+	const cacheHeaders = cacheControl? { 'Cache-Control': cacheControl } : {}
+	return { ...headers,...cacheHeaders};
 }

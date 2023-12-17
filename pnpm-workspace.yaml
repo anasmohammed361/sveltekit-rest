@@ -2,3 +2,4 @@ packages:
   - 'package/'
   - 'www/'
   - 'examples/*'
+  - 'plugins/*'

@@ -1,13 +1,6 @@
 import type { z } from 'zod';
-import type { Route, RouteMethod, Params, TContext, CombineTypes } from './types.js';
-import type { RequestEvent } from '@sveltejs/kit';
-type Options = {
-	contentType: string;
-	headers: {
-		client: Record<string, string>;
-		server: Record<string, string>;
-	};
-};
+import type { Route, Params, TContext, CombineTypes,Options } from './types.js';
+
 class SvelteKitREST<Ttop = undefined> {
 	public get;
 	public post;
@@ -37,52 +30,57 @@ class SvelteKitREST<Ttop = undefined> {
 		return this.getRouter<U>(inp);
 	}
 
-	middleware<U>(func: (inp: { context: TContext<Ttop> }) => U) {
+	middleware<U extends Record<string,any>>(func: (inp: { context: TContext<Ttop> }) => U) {
 		const middlewares = this.middlewares;
 		return SvelteKitREST.getMiddlewareInstance<CombineTypes<TContext<Ttop>,Awaited<U>>>(middlewares, func);
 	}
 
 	private getRouter<T>(schema?: z.ZodSchema<T>) {
 		return {
-			get: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
+			get: <U>(cb: (inp: Params<T, Ttop>) => U,options?:Partial<Options>): Route<T, U, Ttop> => {
 				return {
 					method: 'GET',
 					cb,
 					schema: schema,
-					middlewares:this.middlewares
+					middlewares:this.middlewares,
+					options
 				};
 			},
 
-			post: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
+			post: <U>(cb: (inp: Params<T, Ttop>) => U,options?:Partial<Options>): Route<T, U, Ttop> => {
 				return {
 					method: 'POST',
 					cb,
 					schema: schema,
-					middlewares:this.middlewares
+					middlewares:this.middlewares,
+					options
 				};
 			},
-			put: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
+			put: <U>(cb: (inp: Params<T, Ttop>) => U,options?:Partial<Options>): Route<T, U, Ttop> => {
 				return {
 					method: 'PUT',
 					cb,
 					schema: schema,
-					middlewares:this.middlewares
+					middlewares:this.middlewares,
+					options
 				};
 			},
-			patch: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
+			patch: <U>(cb: (inp: Params<T, Ttop>) => U,options?:Partial<Options>): Route<T, U, Ttop> => {
 				return {
 					method: 'PATCH',
 					cb,
 					schema: schema,
-					middlewares:this.middlewares
+					middlewares:this.middlewares,
+					options
 				};
 			},
-			delete: <U>(cb: (inp: Params<T, Ttop>) => U): Route<T, U, Ttop> => {
+			delete: <U>(cb: (inp: Params<T, Ttop>) => U,options?:Partial<Options>): Route<T, U, Ttop> => {
 				return {
 					method: 'DELETE',
 					cb,
 					schema: schema,
-					middlewares:this.middlewares
+					middlewares:this.middlewares,
+					options
 				};
 			}
 		};

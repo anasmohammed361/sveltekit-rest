@@ -2,7 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { ResolvedUrl } from 'vite';
 import type { z } from 'zod';
 
-type TContext<T> = T extends undefined ? {event:RequestEvent} : ContextReturnType<T>;
+type TContext<T> = T extends undefined ? { event: RequestEvent } : ContextReturnType<T>;
 
 type Params<T, U> = T extends undefined
 	? { context: TContext<U> }
@@ -11,7 +11,8 @@ type Route<T, U, Ttop> = {
 	method: string;
 	cb: (inp: Params<T, Ttop>) => U;
 	schema: z.ZodSchema | undefined;
-	middlewares:((...inp:any)=>any)[]
+	middlewares: ((...inp: any) => any)[];
+	options?: Partial<Options>;
 };
 
 type SingleOrMultipleRoutes = Route<any, any, any> | Record<string, Route>;
@@ -34,4 +35,18 @@ type ContextReturnType<T> = T extends (...args: any[]) => infer R ? Awaited<R> :
 
 type CombineTypes<A, B> = {
 	[K in keyof A]: K extends keyof B ? B[K] : A[K];
-  } & B;
+} & B;
+
+type Options = {
+	responseHeaders: {
+		[key: string]: string;
+	};
+} & {
+	cacheControl: `${number}s` | `${number}h` | `${number}m` | `${number}d`;
+};
+
+type RESTInterfaceOptions = Partial<{
+	createContext: Context<any>;
+	routePrefiex: `/${string}`;
+	cacheContext: boolean;
+}>;
