@@ -1,3 +1,24 @@
+import type { Options } from "$lib/components/types.js";
+
+export async function handleMiddlewares(currentContext:Record<string,any>, middlewares: ((...inp: any) => any)[]) {
+	let context = { ...currentContext };
+	for (const middleware of middlewares) {
+		const result = await middleware({ context });
+		context = { ...context, ...result };
+	}
+	return context;
+}
+
+export function handleOptions(options?: Partial<Options>):Record<string,any> {
+	let cacheControl: string = '';
+	if (options?.cacheControl) {
+		cacheControl = `max-age=${handleCacheControl(options.cacheControl)}`;
+	}
+	const headers = options?.responseHeaders ? options.responseHeaders : {};
+	const cacheHeaders = cacheControl? { 'Cache-Control': cacheControl } : {}
+	return { ...headers,...cacheHeaders};
+}
+
 
 
 export function handleCacheControl(input:`${number}s` | `${number}h` | `${number}m` | `${number}d` ) {

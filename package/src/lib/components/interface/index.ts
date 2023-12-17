@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Context, RESTInterfaceOptions, SingleOrMultipleRoutes } from '../types.js';
-import { createClient } from './client.js';
+import { createSSRClient,createBrowserClient } from './client/index.js';
 import { createServerHandle } from './server.js';
 
 export function createRESTInterface<T>(
@@ -12,7 +12,8 @@ export function createRESTInterface<T>(
 		options.routePrefiex = '/api';
 	}
 	return {
-		client: createClient<T>(input, options.routePrefiex),
-		serverHook: createServerHandle<T>(input, options.routePrefiex, options.createContext,options.cacheContext) // createContext makes user to use db on routes.
+		client: createBrowserClient<T>(input, options.routePrefiex),
+		server: createSSRClient<T,any>(input,options.createContext),
+		serverHook: createServerHandle<any>(input, options.routePrefiex, options.createContext,options.cacheContext) // createContext makes user to use db on routes.
 	};
 }

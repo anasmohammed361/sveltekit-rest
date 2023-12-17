@@ -1,6 +1,6 @@
 import { json, type Handle, error, type RequestEvent } from '@sveltejs/kit';
 import type { SingleOrMultipleRoutes, Route, Context, Options } from '../types.js';
-import { handleCacheControl } from '../options.js';
+import { handleMiddlewares, handleOptions } from './client/lib.js';
 
 export function createServerHandle<T>(
 	input: Record<string, SingleOrMultipleRoutes>,
@@ -92,21 +92,3 @@ function getCurrentObject(obj: Record<string, SingleOrMultipleRoutes>, keys: str
 	}
 }
 
-async function handleMiddlewares(currentContext: any, middlewares: ((...inp: any) => any)[]) {
-	let context = { ...currentContext };
-	for (const middleware of middlewares) {
-		const result = await middleware({ context });
-		context = { ...context, ...result };
-	}
-	return context;
-}
-
-function handleOptions(options?: Partial<Options>):Record<string,any> {
-	let cacheControl: string = '';
-	if (options?.cacheControl) {
-		cacheControl = `max-age=${handleCacheControl(options.cacheControl)}`;
-	}
-	const headers = options?.responseHeaders ? options.responseHeaders : {};
-	const cacheHeaders = cacheControl? { 'Cache-Control': cacheControl } : {}
-	return { ...headers,...cacheHeaders};
-}

@@ -1,13 +1,13 @@
-import type { Client, Route, SingleOrMultipleRoutes } from '../types.js';
+import type { Client, Route, SingleOrMultipleRoutes } from '../../types.js';
 
-export function createClient<T>(
+export function createBrowserClient<T>(
 	input: Record<string, SingleOrMultipleRoutes>,
 	routePrefiex: `/${string}`
 ) {
 	const obj: any = {};
 
 	for (const [key, value] of Object.entries(input)) {
-		if ('method' in value && 'cb' in value) {
+		if ('method' in value && 'cb' in value && 'schema' in value) {
 			obj[key] = handleClient(
 				value as Route<
 					(typeof obj)[typeof key][0]['input'],
@@ -33,11 +33,7 @@ function handleNestedClient<T>(
 	for (const [nestedKey, value] of Object.entries(input)) {
 		if ('method' in value && 'cb' in value) {
 			obj[nestedKey] = handleClient(
-				value as Route<
-					(typeof obj)[typeof key]['0']['input'],
-					ReturnType<(typeof obj)[typeof key]['0']>,
-					(typeof obj)[typeof key][0]['input']['context']
-				>,
+				value as Route<any,any,any>,
 				`${key}.${nestedKey}`,
 				routePrefiex
 			);
@@ -84,3 +80,4 @@ function handleClient(input: Route<any, any, any>, key: string, routePrefiex: `/
 		}
 	};
 }
+

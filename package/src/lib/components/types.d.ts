@@ -26,7 +26,15 @@ type Client<T> = {
 		  ? Client<T[K]>
 		  : never;
 };
-
+type SSRClient<T> ={
+	[K in keyof T]: T[K] extends {
+		cb: (inp: infer M) => infer U;
+	}
+		? (event:RequestEvent,...input: NotNullParams<M>) => Promise<Awaited<U>>
+		: T[K] extends Record<string, Route>
+		  ? Client<T[K]>
+		  : never;
+}
 type RouteMethod<T> = <U>(cb: (inp: RouteMethodInput<T>) => U) => Route;
 
 type Context<T> = (event: RequestEvent) => T | Promise<T>;
