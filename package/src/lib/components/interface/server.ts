@@ -1,5 +1,5 @@
 import { json, type Handle, error, type RequestEvent } from '@sveltejs/kit';
-import type { SingleOrMultipleRoutes, Route, Context, Options } from '../types.js';
+import type { SingleOrMultipleRoutes, Route, Context } from '../types.js';
 import { handleMiddlewares, handleOptions } from './client/lib.js';
 
 export function createServerHandle<T>(

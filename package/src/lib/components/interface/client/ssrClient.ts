@@ -1,7 +1,18 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import type { SSRClient, Context, Route, SingleOrMultipleRoutes } from "../../types.js";
 import { handleMiddlewares } from "./lib.js";
+import { browser } from "$app/environment";
 
+/**
+ * Create the SSR client
+ * @export
+ * @template T - Type of the Router Object
+ * @template U -  Type of context
+ * @param {Record<string, SingleOrMultipleRoutes>} input
+ * @param {?Context<U>} [createContext]
+ * @param {boolean} [cacheContext=false]
+ * @returns {SSRClient<T>} Fully typesafe SSR client.
+ */
 export  function createSSRClient<T,U>(
 	input: Record<string, SingleOrMultipleRoutes>,
     createContext?: Context<U>,
@@ -50,6 +61,9 @@ export  function createSSRClient<T,U>(
 
 function handleClient<T>(input:Route<any,any,any>,getContext:(event: RequestEvent) => Promise<T | undefined>) {
 	const {cb,middlewares,schema} = input;
+	if (browser) {
+		throw new Error("Accessing SSRClient from Browser.");
+	}
 	return async (event:RequestEvent,inp:Parameters<typeof cb>['0'] extends {context:unknown,input:unknown} ? Parameters<typeof cb>['0']['input'] : undefined )=>{
 		const parsedInput = schema?.parse(inp);
 		const obtainedContext =await getContext(event)

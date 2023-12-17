@@ -1,5 +1,13 @@
 import type { Client, Route, SingleOrMultipleRoutes } from '../../types.js';
-
+import {browser} from '$app/environment'
+/**
+ * Create the Browser Client with the generic
+ * @export
+ * @template T - Type of the Router object
+ * @param {Record<string, SingleOrMultipleRoutes>} input
+ * @param {`/`} routePrefiex
+ * @returns {Client<T>} Fully typesafe client. 
+ */
 export function createBrowserClient<T>(
 	input: Record<string, SingleOrMultipleRoutes>,
 	routePrefiex: `/${string}`
@@ -31,7 +39,7 @@ function handleNestedClient<T>(
 ) {
 	const obj: any = {};
 	for (const [nestedKey, value] of Object.entries(input)) {
-		if ('method' in value && 'cb' in value) {
+		if ('method' in value && 'cb' in value && 'schema' in value) {
 			obj[nestedKey] = handleClient(
 				value as Route<any,any,any>,
 				`${key}.${nestedKey}`,
@@ -52,6 +60,9 @@ function handleNestedClient<T>(
 function handleClient(input: Route<any, any, any>, key: string, routePrefiex: `/${string}`) {
 	const { cb, method, schema } = input;
 	return async (inp: Parameters<typeof cb>['0'] extends {context:unknown,input:unknown} ? Parameters<typeof cb>['0']['input'] : undefined ) => {
+		if (!browser) {
+			console.error("Using Browser Client from the Server. Consider using SSRClient.")
+		}
 		let request: Promise<Response>;
 		const parsedInput = schema?.parse(inp);
 		if (method === 'GET') {

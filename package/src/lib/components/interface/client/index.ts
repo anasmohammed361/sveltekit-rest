@@ -1,4 +1,4 @@
-import { createBrowserClient } from "./browserClient.js";
-import { createSSRClient } from "./ssrClient.js";
+import { createBrowserClient } from './browserClient.js';
+import { createSSRClient } from './ssrClient.js';
 
-export {createBrowserClient,createSSRClient}
+export { createBrowserClient, createSSRClient };
