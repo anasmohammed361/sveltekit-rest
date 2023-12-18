@@ -1,5 +1,5 @@
 import type { Client, Route, SingleOrMultipleRoutes } from '../../types.js';
-import {browser} from '$app/environment'
+
 /**
  * Create the Browser Client with the generic
  * @export
@@ -60,7 +60,7 @@ function handleNestedClient<T>(
 function handleClient(input: Route<any, any, any>, key: string, routePrefiex: `/${string}`) {
 	const { cb, method, schema } = input;
 	return async (inp: Parameters<typeof cb>['0'] extends {context:unknown,input:unknown} ? Parameters<typeof cb>['0']['input'] : undefined ) => {
-		if (!browser) {
+		if (!globalThis.window) {
 			console.error("Using Browser Client from the Server. Consider using SSRClient.")
 		}
 		let request: Promise<Response>;
