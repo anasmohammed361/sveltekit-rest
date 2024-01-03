@@ -34,7 +34,7 @@ export function createServerHandle<T>(
 			const keys = url.replace(`${routePrefiex}/`, '').split('.');
 			const currentRouteObject = getCurrentObject(input, keys);
 			if (!currentRouteObject) {
-				throw error(404, 'Not Found');
+				error(404, 'Not Found');
 			}
 			if (event.request.method === currentRouteObject.method) {
 				let data: any;
@@ -64,7 +64,7 @@ export function createServerHandle<T>(
 					}
 				);
 			} else {
-				throw error(405);
+				error(405);
 			}
 		}
 		return await resolve(event);
